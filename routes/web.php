@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,3 +21,22 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+// Subscribe
+Route::get('/subscribe', function () {
+    return view('subscribe.index', [
+        'intent' => auth()->user()->createSetupIntent()
+    ]);
+})->name('subcribe')->middleware('nonPayingCustomer');
+
+Route::post('/subscribe', function (Request $request) {
+    $request->user()->newSubscription(
+        'cashier', $request->plan
+    )->create($request->paymentMethod);
+
+    return back();
+})->name('subscribe.store')->middleware('nonPayingCustomer');
+
+Route::get('/members', function () {
+    return view('member.index');
+})->name('member')->middleware('payingCustomer');
