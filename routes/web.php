@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Laravel\Cashier\Subscription;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,5 +39,26 @@ Route::post('/subscribe', function (Request $request) {
 })->name('subscribe.store')->middleware('nonPayingCustomer');
 
 Route::get('/members', function () {
+    // $user = auth()->user();
+
+    // $user->applyBalance(300, 'Bad usage penalty.');
+    // $subscriptions = Subscription::query()->active()->get();
+    // $subscriptions = $user->subscriptions()->canceled()->get();
+
+    // Subscription::query()->active();
+
+
+    // $transactions = $user->balanceTransactions();
+
+    // $balance = $user->balance();
+
     return view('member.index');
 })->name('member')->middleware('payingCustomer');
+
+Route::get('/cancel-subcription', function () {
+    $user = auth()->user();
+    // $user->subscription('cashier')->cancelNow();
+    $user->subscription('cashier')->cancelNowAndInvoice();
+
+    return back();
+})->name('cancel-subcription')->middleware('payingCustomer');
