@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SubcriptionController;
 use Illuminate\Http\Request;
 use Laravel\Cashier\Subscription;
 use Illuminate\Support\Facades\Route;
@@ -23,42 +24,19 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-// Subscribe
-Route::get('/subscribe', function () {
-    return view('subscribe.index', [
-        'intent' => auth()->user()->createSetupIntent()
-    ]);
-})->name('subcribe')->middleware('nonPayingCustomer');
+// Subscribe part 1
+Route::controller(SubcriptionController::class)->group(function (){
+    Route::get('subscribe', 'showPlan')->name('subcribe')->middleware('nonPayingCustomer');;
+    Route::post('subscribe', 'purchasePlan')->name('subscribe.store')->middleware('nonPayingCustomer');
+    Route::get('members', 'members')->name('member')->middleware('payingCustomer');
+    Route::get('cancel-subcription', 'cancelPlan')->name('cancel-subcription')->middleware('payingCustomer');
+});
 
-Route::post('/subscribe', function (Request $request) {
-    $request->user()->newSubscription(
-        'cashier', $request->plan
-    )->create($request->paymentMethod);
-
-    return back();
-})->name('subscribe.store')->middleware('nonPayingCustomer');
-
-Route::get('/members', function () {
-    // $user = auth()->user();
-
-    // $user->applyBalance(300, 'Bad usage penalty.');
-    // $subscriptions = Subscription::query()->active()->get();
-    // $subscriptions = $user->subscriptions()->canceled()->get();
-
-    // Subscription::query()->active();
-
-
-    // $transactions = $user->balanceTransactions();
-
-    // $balance = $user->balance();
-
-    return view('member.index');
-})->name('member')->middleware('payingCustomer');
-
-Route::get('/cancel-subcription', function () {
-    $user = auth()->user();
-    // $user->subscription('cashier')->cancelNow();
-    $user->subscription('cashier')->cancelNowAndInvoice();
-
-    return back();
-})->name('cancel-subcription')->middleware('payingCustomer');
+// Subscribe part 2
+Route::controller(SubcriptionController::class)->group(function (){
+    Route::get('plans/list', 'planlist')->name('plan.list');
+    // Route::get('plans/list', 'planlist')->name('payments');
+    // Route::post('subscribe', 'purchasePlan')->name('subscribe.store')->middleware('nonPayingCustomer');
+    // Route::get('members', 'members')->name('member')->middleware('payingCustomer');
+    // Route::get('cancelPlan', 'cancel-subcription')->name('cancel-subcription')->middleware('payingCustomer');
+});

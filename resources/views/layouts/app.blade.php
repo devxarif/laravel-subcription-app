@@ -34,13 +34,16 @@
                     <ul class="navbar-nav me-auto">
                         @if (auth()->check() && !auth()->user()->subscribed('cashier'))
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('subcribe') }}">Subscribe</a>
+                                <a class="nav-link" href="{{ route('subcribe') }}">Subscribe (Part-1)</a>
                             </li>
                         @else
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('member') }}">Members</a>
+                                <a class="nav-link" href="{{ route('member') }}">Members (Part-1)</a>
                             </li>
                         @endif
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('plan.list') }}">Planlist (Part-2)</a>
+                        </li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->
